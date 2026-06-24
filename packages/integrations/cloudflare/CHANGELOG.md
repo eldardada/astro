@@ -1,5 +1,11 @@
 # @astrojs/cloudflare
 
+## 14.0.1
+
+### Patch Changes
+
+- [#17175](https://github.com/withastro/astro/pull/17175) [`7a7d879`](https://github.com/withastro/astro/commit/7a7d8791503cf460e0fb5ad1e9f52b84ec19928f) Thanks [@astrobot-houston](https://github.com/astrobot-houston)! - Fixes `astro dev` OOM crashes for `@astrojs/cloudflare` users on Vite 8 by migrating the frontmatter scan plugin to Rolldown-compatible options.
+
 ## 14.0.0
 
 ### Major Changes

@@ -22,6 +22,7 @@ async function compileWithRust(source: string, configOverrides: Partial<AstroCon
 		toolbarEnabled: false,
 		filename: '/src/components/index.astro',
 		source,
+		configAlias: null,
 	});
 }
 

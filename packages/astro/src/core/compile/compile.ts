@@ -5,6 +5,7 @@ import type { AstroConfig } from '../../types/public/config.js';
 import type { AstroError } from '../errors/errors.js';
 import { AggregateError, CompilerError } from '../errors/errors.js';
 import { AstroErrorData } from '../errors/index.js';
+import type { Alias } from '../../vite-plugin-config-alias/index.js';
 import { normalizePath, resolvePath } from '../viteUtils.js';
 import { createStylePreprocessor, type PartialCompileCssResult } from './style.js';
 import type { CompileCssResult } from './types.js';
@@ -15,6 +16,7 @@ export interface CompileProps {
 	toolbarEnabled: boolean;
 	filename: string;
 	source: string;
+	configAlias: Alias[] | null;
 }
 
 export interface CompileResult extends Omit<TransformResult, 'css'> {
@@ -27,6 +29,7 @@ export async function compile({
 	toolbarEnabled,
 	filename,
 	source,
+	configAlias,
 }: CompileProps): Promise<CompileResult> {
 	const cssPartialCompileResults: PartialCompileCssResult[] = [];
 	const cssTransformErrors: AstroError[] = [];
@@ -41,6 +44,7 @@ export async function compile({
 				astroConfig,
 				cssPartialCompileResults,
 				cssTransformErrors,
+				configAlias,
 			}),
 		);
 

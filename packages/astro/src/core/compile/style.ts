@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { preprocessCSS, type ResolvedConfig } from 'vite';
 import type { AstroConfig } from '../../types/public/config.js';
+import { type Alias, resolveCssAliases } from '../../vite-plugin-config-alias/index.js';
 import { AstroErrorData, CSSError, positionAt } from '../errors/index.js';
 import { normalizePath } from '../viteUtils.js';
 import type { CompileCssResult } from './types.js';
@@ -138,12 +139,14 @@ export function createStylePreprocessor({
 	astroConfig,
 	cssPartialCompileResults,
 	cssTransformErrors,
+	configAlias,
 }: {
 	filename: string;
 	viteConfig: ResolvedConfig;
 	astroConfig: AstroConfig;
 	cssPartialCompileResults: Partial<CompileCssResult>[];
 	cssTransformErrors: Error[];
+	configAlias: Alias[] | null;
 }): PreprocessStyleFn {
 	let processedStylesCount = 0;
 
@@ -152,6 +155,16 @@ export function createStylePreprocessor({
 		const lang = `.${attrs?.lang || 'css'}`.toLowerCase();
 		const id = `${filename}?astro&type=style&index=${index}&lang${lang}`;
 		try {
+			// Resolve tsconfig path aliases in CSS before preprocessCSS(), because
+			// Vite's internal postcss-import resolver does not know about tsconfig aliases.
+			// The astro:tsconfig-alias-css transform plugin handles standalone .css files,
+			// but <style> blocks in .astro components go through preprocessCSS() directly,
+			// bypassing the Vite transform pipeline.
+			let processedContent = content;
+			if (configAlias) {
+				processedContent = resolveCssAliases(content, configAlias) ?? content;
+			}
+
 			// Workaround for #16524: when lightningcss is the Vite CSS transformer,
 			// exclude its Nesting lowering pass so the Astro compiler's scope
 			// injector still sees `.parent` (and not `:where(.parent ...)`) as the
@@ -161,7 +174,7 @@ export function createStylePreprocessor({
 				viteConfig.css?.transformer === 'lightningcss'
 					? (withNestingExcluded(viteConfig) ?? viteConfig)
 					: viteConfig;
-			const result = await preprocessCSS(content, id, effectiveViteConfig);
+			const result = await preprocessCSS(processedContent, id, effectiveViteConfig);
 
 			// Rewrite CSS URLs to include the base path
 			// This is necessary because preprocessCSS doesn't handle URL rewriting

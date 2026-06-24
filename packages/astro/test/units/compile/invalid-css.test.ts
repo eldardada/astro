@@ -19,6 +19,7 @@ describe('astro/src/core/compile', () => {
 					viteConfig: await resolveConfig({ configFile: false }, 'serve'),
 					toolbarEnabled: false,
 					filename: '/src/pages/index.astro',
+					configAlias: null,
 					source: `
 	---
 	---

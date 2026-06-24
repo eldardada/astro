@@ -30,6 +30,7 @@ async function compile(source: string, id: string, inlineConfig: InlineConfig = 
 		toolbarEnabled: false,
 		filename: id,
 		source,
+		configAlias: null,
 	};
 	return (
 		compileAstro as (opts: {

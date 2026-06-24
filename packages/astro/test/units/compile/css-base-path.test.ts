@@ -21,6 +21,7 @@ async function compileWithBase(source: string, base = '/') {
 		toolbarEnabled: false,
 		filename: '/src/pages/index.astro',
 		source,
+		configAlias: null,
 	};
 	return compileAstro({
 		compileProps: props as any,
